@@ -27,7 +27,7 @@ This will enable 'azure-cni' network plugin - currently, the only supported opti
 https://docs.microsoft.com/en-us/azure/aks/faq#what-is-azure-cni-transparent-mode-vs-bridge-mode
 
 ```
-az aks create --resource-group nigelResourceGroup --name nigelAKSCluster --node-vm-size Standard_B2ms --node-count 3 --zones 1 2 3 --network-plugin azure --network-policy none
+az aks create --resource-group nigelResourceGroup --name nigelAKSCluster --node-vm-size Standard_B2ms --node-count 3 --zones 1 2 3 --network-plugin azure
 ```
 
 In Transparent Mode, Azure CNI will create and add host-side pod veth pair interfaces that will be added to the host network. 
@@ -36,7 +36,7 @@ Essentially, Pod-to-Pod communication is over layer 3 and pod traffic is routed 
 
 <img width="667" alt="Screenshot 2021-05-26 at 10 24 43" src="https://user-images.githubusercontent.com/82048393/119646172-c34b9300-be16-11eb-951e-21b7bd8310d8.png">
 
-The final flag we selected was to have Network policy not set ( --network-policy none )
+Recommended to have Network policy not set. Have not tested with ( --network-policy calico )
 This avoids conflicts between other network policy providers in the cluster and Calico Enterprise.
 https://docs.microsoft.com/en-us/azure/aks/use-network-policies
 
