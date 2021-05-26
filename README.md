@@ -19,14 +19,25 @@ https://docs.tigera.io/getting-started/bare-metal/requirements#node-requirements
 The Standard_B2ms VM provides 2 vCPU's and 8.0GiB of Memory - ideal for our deployment:
 https://docs.microsoft.com/en-us/azure/virtual-machines/sizes-b-series-burstable
 
-We are also selecting the 'azure-cni' as our network plugin - this allows us to use transparent networking mode:
+AKS cluster created using the Azure CLI are created with transparent mode by default. 
+Therefore, we do not need to add a feature flag for transparent mode (ie: --transparent-mode enable)
+
+However, we must ensure the cluster is started with the option (--network-plugin azure).
+This will enable 'azure-cni' network plugin - currently, the only supported option transparent networking mode:
 https://docs.microsoft.com/en-us/azure/aks/faq#what-is-azure-cni-transparent-mode-vs-bridge-mode
 
 ```
-az aks create --resource-group nigelResourceGroup --name nigelAKSCluster --node-vm-size Standard_B2ms --node-count 3 --zones 1 2 3 --network-plugin azure
+az aks create --resource-group nigelResourceGroup --name nigelAKSCluster --node-vm-size Standard_B2ms --node-count 3 --zones 1 2 3 --network-plugin azure --network-policy none
 ```
 
+In Transparent Mode, Azure CNI will create and add host-side pod veth pair interfaces that will be added to the host network. 
+Intra VM Pod-to-Pod communication is through ip routes that the CNI will add. 
+Essentially, Pod-to-Pod communication is over layer 3 and pod traffic is routed by L3 routing rules.
+
 <img width="667" alt="Screenshot 2021-05-26 at 10 24 43" src="https://user-images.githubusercontent.com/82048393/119646172-c34b9300-be16-11eb-951e-21b7bd8310d8.png">
+
+The final flag we selected was to have Network policy not set. 
+This avoids conflicts between other network policy providers in the cluster and Calico Enterprise.
 
 
 Calico CNI is currently not supported in with transparent mode in AKS - this will break the install process is chosen.
