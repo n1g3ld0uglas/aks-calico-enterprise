@@ -275,3 +275,17 @@ kubectl get pods -n kube-system
 
 <img width="567" alt="Screenshot 2021-05-26 at 11 26 52" src="https://user-images.githubusercontent.com/82048393/119648973-fb080a00-be19-11eb-9551-c718ddd6a3e6.png">
 
+
+If you wish to delete your AKS cluster, you can run the following command:
+(this can take a few minutes to complete)
+
+```
+az aks delete --resource-group nigelResourceGroup --name nigelAKSCluster
+```
+
+Finally, delete to associated Resource Group (if no longer needed):
+```
+az group delete --name nigelResourceGroup --location northeurope
+```
+<img width="677" alt="Screenshot 2021-05-26 at 13 21 56" src="https://user-images.githubusercontent.com/82048393/119658733-660b0e00-be25-11eb-85dd-9d63f5b61962.png">
+
