@@ -8,6 +8,7 @@ https://www.otava.com/reference/how-to-use-azure-resource-groups-a-simple-explan
 ```
 az group create --name nigelResourceGroup --location northeurope
 ```
+<img width="909" alt="Screenshot 2021-05-26 at 10 18 28" src="https://user-images.githubusercontent.com/82048393/119645850-62bc5600-be16-11eb-92c3-f33b9850b58e.png">
 
 Next we will create the AKS cluster. This has been configured with 3 worker nodes (since managed k8's don't worry about the need for a master node).
 The VM type is 'Standard_B2ms' - this way we don't run into any issues with CPU/Memory allocation during the installation process.
@@ -24,6 +25,9 @@ https://docs.microsoft.com/en-us/azure/aks/faq#what-is-azure-cni-transparent-mod
 ```
 az aks create --resource-group nigelResourceGroup --name nigelAKSCluster --node-vm-size Standard_B2ms --node-count 3 --zones 1 2 3 --network-plugin azure
 ```
+
+<img width="667" alt="Screenshot 2021-05-26 at 10 24 43" src="https://user-images.githubusercontent.com/82048393/119646172-c34b9300-be16-11eb-951e-21b7bd8310d8.png">
+
 
 Calico CNI is currently not supported in with transparent mode in AKS - this will break the install process is chosen.
 Before proceeding, I would merge "nigelAKSCluster" as the current context within /home/nigel/.kube/config
