@@ -196,3 +196,8 @@ Since there is no Calico CNI, we won't be able to confirm whether VXLAN or IPIP 
 ```
 ./calicoctl get ippool -o wide
 ```
+
+Confirm all Azure CNI pods are running within the kube-system namespace:
+```
+kubectl get pods -n kube-system
+```
