@@ -36,8 +36,9 @@ Essentially, Pod-to-Pod communication is over layer 3 and pod traffic is routed 
 
 <img width="667" alt="Screenshot 2021-05-26 at 10 24 43" src="https://user-images.githubusercontent.com/82048393/119646172-c34b9300-be16-11eb-951e-21b7bd8310d8.png">
 
-The final flag we selected was to have Network policy not set. 
+The final flag we selected was to have Network policy not set ( --network-policy none )
 This avoids conflicts between other network policy providers in the cluster and Calico Enterprise.
+https://docs.microsoft.com/en-us/azure/aks/use-network-policies
 
 
 Calico CNI is currently not supported in with transparent mode in AKS - this will break the install process is chosen.
