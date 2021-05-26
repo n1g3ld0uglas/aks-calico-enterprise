@@ -41,10 +41,16 @@ I also confirm the nodes are in each of the failire zones specified within my cl
 kubectl describe nodes | grep -e "Name:" -e "failure-domain.beta.kubernetes.io/zone"
 ```
 
+<img width="774" alt="Screenshot 2021-05-26 at 10 32 25" src="https://user-images.githubusercontent.com/82048393/119646449-17ef0e00-be17-11eb-8546-40a558e63438.png">
+
+
 The goal is to have each node in it's own zone within the same region, in the case where the one zone fails:
 ```
 kubectl get nodes -o custom-columns=NAME:'{.metadata.name}',REGION:'{.metadata.labels.topology\.kubernetes\.io/region}',ZONE:'{metadata.labels.topology\.kubernetes\.io/zone}'
 ```
+
+<img width="1230" alt="Screenshot 2021-05-26 at 10 33 54" src="https://user-images.githubusercontent.com/82048393/119646586-3ce38100-be17-11eb-97f1-24f996c3ac99.png">
+
 
 If you ever need planned downtime for the cluster, you can easily scale down the node count to 0 - revert back to 3 nodes when needed:
 ```
@@ -57,6 +63,9 @@ StorageClass tells Calico Enterprise to use the GCE Persistent Disks for log sto
 ```
 kubectl apply -f https://raw.githubusercontent.com/n1g3ld0uglas/netpolTest/main/sc/afs.yaml
 ```
+
+<img width="814" alt="Screenshot 2021-05-26 at 10 37 05" src="https://user-images.githubusercontent.com/82048393/119646709-5f759a00-be17-11eb-96df-b6d04eb44595.png">
+
 
 Install the Tigera operator and custom resource definitions
 ```
@@ -78,10 +87,16 @@ Install your pull secret - referencing the same config.json file
 kubectl create secret generic tigera-pull-secret --type=kubernetes.io/dockerconfigjson -n tigera-operator --from-file=.dockerconfigjson=config.json
 ```
 
+<img width="1230" alt="Screenshot 2021-05-26 at 10 41 05" src="https://user-images.githubusercontent.com/82048393/119646782-74522d80-be17-11eb-9111-e43abed9f6a8.png">
+
+
 Install the AKS-specific custom resources
 ```
 kubectl create -f https://docs.tigera.io/manifests/aks/custom-resources.yaml
 ```
+
+<img width="1230" alt="Screenshot 2021-05-26 at 10 41 52" src="https://user-images.githubusercontent.com/82048393/119646830-83d17680-be17-11eb-8036-108ee735a033.png">
+
 
 Monitor progress with the following command. This can take a 4-5 mins (usually)
 We are waiting on for 'apiserver' and 'calico' to show as 'true' under 'AVAILABLE'
@@ -89,15 +104,24 @@ We are waiting on for 'apiserver' and 'calico' to show as 'true' under 'AVAILABL
 watch kubectl get tigerastatus
 ```
 
+<img width="1230" alt="Screenshot 2021-05-26 at 10 44 35" src="https://user-images.githubusercontent.com/82048393/119646868-8e8c0b80-be17-11eb-8b29-75e47bdcefd9.png">
+
+
 If there is any significant delay in this changed, get a status on all running pods:
 ```
 kubectl get pods -A
 ```
 
+<img width="861" alt="Screenshot 2021-05-26 at 10 45 07" src="https://user-images.githubusercontent.com/82048393/119646941-9fd51800-be17-11eb-8fd5-326e0e49b151.png">
+
+
 You can 'describe' - get information from a specific pod within a namespace that is not successfully running:
 ```
 kubectl describe pod tigera-secure-kb-8848584d7-dclwb -n tigera-kibana
 ```
+
+<img width="1230" alt="Screenshot 2021-05-26 at 10 47 00" src="https://user-images.githubusercontent.com/82048393/119647053-bbd8b980-be17-11eb-8957-d481e1f6de23.png">
+
 
 Create the license file (again, provided by the team at Tigera) so we can apply the update:
 ```
@@ -109,11 +133,17 @@ In order for the remaining components to work, you must install the license prov
 kubectl apply -f license.yaml
 ```
 
+<img width="1230" alt="Screenshot 2021-05-26 at 10 51 02" src="https://user-images.githubusercontent.com/82048393/119647077-c3985e00-be17-11eb-9413-9daebae38033.png">
+
+
 You can now monitor progress with the following command - this might take a few minutes to complete.
 As always, you can check the staus of pod creation by regularly checking - kubectl get pods -A
 ```
 watch kubectl get tigerastatus
 ```
+
+<img width="1230" alt="Screenshot 2021-05-26 at 10 53 59" src="https://user-images.githubusercontent.com/82048393/119647148-d6ab2e00-be17-11eb-8aac-20f02da81d1b.png">
+
 
 You will start seeing the new pods with status 'ContainerCreating' after the license is accepted.
 Don't be afraid to run kubectl describe command if manager is taking too long to appear:
@@ -122,21 +152,33 @@ Don't be afraid to run kubectl describe command if manager is taking too long to
 kubectl describe pod tigera-manager-77b7f9d674-8rl27 -n tigera-manager
 ```
 
+<img width="1230" alt="Screenshot 2021-05-26 at 10 52 51" src="https://user-images.githubusercontent.com/82048393/119647196-e7f43a80-be17-11eb-9890-1062147dd8b0.png">
+
+
 Secure Calico component communications, install this set of network policies
 ```
 kubectl create -f https://docs.tigera.io/manifests/tigera-policies-managed.yaml
 ```
+
+<img width="1230" alt="Screenshot 2021-05-26 at 10 55 05" src="https://user-images.githubusercontent.com/82048393/119647263-f6daed00-be17-11eb-89a9-7284f40b43bd.png">
+
 
 To expose the manager using a load balancer, create the following service
 ```
 kubectl apply -f https://raw.githubusercontent.com/n1g3ld0uglas/netpolTest/main/sc/lb.yaml
 ```
 
+<img width="810" alt="Screenshot 2021-05-26 at 10 56 36" src="https://user-images.githubusercontent.com/82048393/119647339-0eb27100-be18-11eb-8a4a-48b0eeae2cb6.png">
+
+
 After creating the service, it may take a few minutes for the load balancer to be created.
 You can access Calico Enterprise via 'EXTERNAL-IP:PORT(443)'
 ```
 kubectl get services -n tigera-manager tigera-manager-external
 ```
+
+<img width="803" alt="Screenshot 2021-05-26 at 11 49 42" src="https://user-images.githubusercontent.com/82048393/119647740-8d0f1300-be18-11eb-8005-acf009234d81.png">
+
 
 First, create a service account in the desired namespace.
 A Service Account (SA) must be located in a specific namespace.
@@ -153,14 +195,27 @@ Get the token from the service account
 kubectl get secret $(kubectl get serviceaccount nigel -o jsonpath='{range .secrets[*]}{.name}{"\n"}{end}' | grep token) -o go-template='{{.data.token | base64decode}}' && echo
 ```
 
+<img width="1230" alt="Screenshot 2021-05-26 at 11 02 45" src="https://user-images.githubusercontent.com/82048393/119648120-f98a1200-be18-11eb-9a8f-7c3302c39ff2.png">
+
+<img width="1230" alt="Screenshot 2021-05-26 at 11 04 02" src="https://user-images.githubusercontent.com/82048393/119648258-26d6c000-be19-11eb-91f1-6edf7831c17f.png">
+
+<img width="1230" alt="Screenshot 2021-05-26 at 11 04 15" src="https://user-images.githubusercontent.com/82048393/119648336-3eae4400-be19-11eb-9c52-ecd1c2cf956a.png">
+
+
 Log into the web UI with the above base64 encoded token.
 This is the basic authentication method - however, you can integrate with your idP for more secure authentication.
+
+<img width="1230" alt="Screenshot 2021-05-26 at 11 04 58" src="https://user-images.githubusercontent.com/82048393/119648388-4d94f680-be19-11eb-9bf5-d38f55e3996a.png">
+
 
 Since you ran the below 'tigera-policies-managed.yaml' file already, you should have an 'allow-tigera' tier created.
 This tier is responsible for ensuring all Calico/Tigera componets work smoothly. It has a higher precendence over all tier down to the 'default' tier.
 ```
 kubectl create -f https://docs.tigera.io/manifests/tigera-policies-managed.yaml
 ```
+
+<img width="883" alt="Screenshot 2021-05-26 at 11 56 46" src="https://user-images.githubusercontent.com/82048393/119648563-8339df80-be19-11eb-9da1-953eabec6742.png">
+
 
 You can access Kibana via your 'EXTERNAL-IP:9443/tigera-kibana/login'
 The username is 'elastic' by default, and the password token can be generated via the below command:
@@ -169,12 +224,19 @@ The username is 'elastic' by default, and the password token can be generated vi
 kubectl -n tigera-elasticsearch get secret tigera-secure-es-elastic-user -o go-template='{{.data.elastic | base64decode}}' && echo
 ```
 
+<img width="1230" alt="Screenshot 2021-05-26 at 11 11 14" src="https://user-images.githubusercontent.com/82048393/119648645-9d73bd80-be19-11eb-9748-4ff8c79fdc7b.png">
+
+<img width="1230" alt="Screenshot 2021-05-26 at 11 13 42" src="https://user-images.githubusercontent.com/82048393/119648739-b9775f00-be19-11eb-80ad-bb58cd7a33e8.png">
+
+
+
 CalicoCTL (Calico CLI tool) is not installed with Calico Enterprise by default. 
 If this is not installed already, I would recommend installing this utility:
 
 ```
 curl -o calicoctl -O -L "https://github.com/projectcalico/calicoctl/releases/download/v3.19.0/calicoctl"
 ```
+
 
 I prefer to convert this into an executable. 
 However, there are other options on how to use calicoctl:
@@ -189,6 +251,8 @@ You need to explicitly specify 'StrictAffinity' if you wish to assign your own I
 ./calicoctl ipam show --show-configuration
 ```
 
+<img width="915" alt="Screenshot 2021-05-26 at 11 18 06" src="https://user-images.githubusercontent.com/82048393/119648832-cf851f80-be19-11eb-80f5-4f9ce427ebc7.png">
+
 Since we are using Azure-CNI (and not Calico CNI), we cannot see the IPAM (IP Address Management) data.
 Calico's CNI would be able to expose the IP usage as well as IP allocation within CIDR's and IP Groups.
 ```
@@ -201,7 +265,13 @@ Since there is no Calico CNI, we won't be able to confirm whether VXLAN or IPIP 
 ./calicoctl get ippool -o wide
 ```
 
+<img width="506" alt="Screenshot 2021-05-26 at 11 18 58" src="https://user-images.githubusercontent.com/82048393/119648958-f5122900-be19-11eb-958f-bbcaaf407f35.png">
+
+
 Confirm all Azure CNI pods are running within the kube-system namespace:
 ```
 kubectl get pods -n kube-system
 ```
+
+<img width="567" alt="Screenshot 2021-05-26 at 11 26 52" src="https://user-images.githubusercontent.com/82048393/119648973-fb080a00-be19-11eb-9551-c718ddd6a3e6.png">
+
